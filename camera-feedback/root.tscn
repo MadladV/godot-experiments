@@ -1,0 +1,92 @@
+[gd_scene load_steps=14 format=3 uid="uid://bfujg1tyimr7l"]
+
+[ext_resource type="Script" uid="uid://kiq23qrqdc20" path="res://scenes/player/Player.cs" id="1_pq8q7"]
+[ext_resource type="Texture2D" uid="uid://d2n7edrdmxg6d" path="res://assets/crosshair001.png" id="2_pyidc"]
+[ext_resource type="Texture2D" uid="uid://mhxtc2du02uq" path="res://assets/crosshair011.png" id="3_vvh5c"]
+[ext_resource type="Texture2D" uid="uid://cidhupg8dg0qw" path="res://assets/prototype textures/Dark/texture_01.png" id="4_28aoi"]
+[ext_resource type="Texture2D" uid="uid://dhv8suw60fs0r" path="res://assets/prototype textures/Orange/texture_01.png" id="5_jnlp7"]
+[ext_resource type="Texture2D" uid="uid://c081ojssiwfrj" path="res://assets/prototype textures/Orange/texture_02.png" id="5_l8v81"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_pq8q7"]
+
+[sub_resource type="Sky" id="Sky_pyidc"]
+sky_material = SubResource("ProceduralSkyMaterial_pq8q7")
+
+[sub_resource type="Environment" id="Environment_vvh5c"]
+background_mode = 2
+sky = SubResource("Sky_pyidc")
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_vho56"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jnlp7"]
+albedo_texture = ExtResource("4_28aoi")
+uv1_triplanar = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vyht1"]
+albedo_texture = ExtResource("5_l8v81")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l8v81"]
+albedo_texture = ExtResource("5_jnlp7")
+uv1_triplanar = true
+
+[node name="Node3D" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_vvh5c")
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." node_paths=PackedStringArray("camera", "head", "collider")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+script = ExtResource("1_pq8q7")
+camera = NodePath("CollisionShape3D/Head/Camera3D")
+head = NodePath("CollisionShape3D/Head")
+collider = NodePath("CollisionShape3D")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
+shape = SubResource("CapsuleShape3D_vho56")
+
+[node name="Head" type="Node3D" parent="CharacterBody3D/CollisionShape3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Sprite3D" type="Sprite3D" parent="CharacterBody3D/CollisionShape3D/Head"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, -1)
+double_sided = false
+no_depth_test = true
+fixed_size = true
+texture = ExtResource("3_vvh5c")
+
+[node name="Camera3D" type="Camera3D" parent="CharacterBody3D/CollisionShape3D/Head"]
+fov = 90.0
+
+[node name="Control" type="Control" parent="CharacterBody3D"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="CharacterBody3D/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -72.0
+offset_top = -72.0
+offset_right = 72.0
+offset_bottom = 72.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_pyidc")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+material_override = SubResource("StandardMaterial3D_jnlp7")
+use_collision = true
+size = Vector3(25, 1, 25)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -10)
+material_override = SubResource("StandardMaterial3D_vyht1")
+material = SubResource("StandardMaterial3D_l8v81")
