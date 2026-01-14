@@ -5,8 +5,9 @@ public partial class Player : CharacterBody3D
 	[Export] private Camera3D camera;
 	[Export] private Node3D head;
 	[Export] private CollisionShape3D collider;
+	[Export] private Label label;
 
-	public const float Speed = 5f;
+	public float Speed = 5f;
 	public const float JumpVelocity = 4.5f;
 	private float lookSensitivity = Mathf.DegToRad(360f / 14400f);
 
@@ -35,11 +36,16 @@ public partial class Player : CharacterBody3D
 		}
 	}
 
-	public override void _PhysicsProcess(double delta)
+	public override void _Process(double delta)
 	{
 		Vector3 velocity = Velocity;
-
 		Vector2 inputDir = Input.GetVector("left", "right", "forward", "back");
+		Vector3 localVelocity = new Vector3(
+			Basis.X.Dot(Velocity.Normalized()),
+			Basis.Y.Dot(Velocity.Normalized()),
+			Basis.Z.Dot(Velocity.Normalized())
+		) * Velocity.Length();
+		
 		if (!IsOnFloor())
 		{
 			velocity += GetGravity() * (float)delta;
@@ -55,10 +61,12 @@ public partial class Player : CharacterBody3D
 			velocity -= velocity.LimitLength(3f * Speed * (float)delta);
 		}
 
+		Speed = Input.IsActionPressed("sprint") ? 5f : 3f;
+
 		if (!inputDir.IsZeroApprox() && IsOnFloor())
 		{
 			Vector2 foo = new Vector2(velocity.X, velocity.Z).Normalized();
-			float powerMul = -foo.Dot(inputDir.Normalized()) + 2f;
+			float powerMul = -foo.Dot(inputDir.Normalized()) + 2f; // (-1, 1) -> (1, 3)
 			powerMul *= 3f;
 			
 			Vector2 rotated = inputDir.Rotated(-GlobalRotation.Y);
@@ -66,15 +74,9 @@ public partial class Player : CharacterBody3D
 			
 			float fallVelocity = velocity.Y;
 			velocity *= new Vector3(1f, 0f, 1f);
-			velocity = velocity.LimitLength(5f) with { Y = fallVelocity };
+			velocity = velocity.LimitLength(Speed) with { Y = fallVelocity };
 		}
 		
-		Vector3 localVelocity = new Vector3(
-			Basis.X.Dot(Velocity.Normalized()),
-			Basis.Y.Dot(Velocity.Normalized()),
-			Basis.Z.Dot(Velocity.Normalized())
-		) * Velocity.Length();
-
 		cameraBob.Accum += localVelocity.Length() * (float)delta * cameraBob.Speed;
 		cameraBob.Accum %= Mathf.Tau;
 
@@ -85,6 +87,7 @@ public partial class Player : CharacterBody3D
 			Z = localVelocity.X * Mathf.DegToRad(-0.4f)
 		};
 
+		label.Text = $"{velocity.Length():0} m/s";
 		Velocity = velocity;
 		MoveAndSlide();
 	}

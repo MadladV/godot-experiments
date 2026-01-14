@@ -34,12 +34,13 @@ uv1_triplanar = true
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_vvh5c")
 
-[node name="CharacterBody3D" type="CharacterBody3D" parent="." node_paths=PackedStringArray("camera", "head", "collider")]
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." node_paths=PackedStringArray("camera", "head", "collider", "label")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 script = ExtResource("1_pq8q7")
 camera = NodePath("CollisionShape3D/Head/Camera3D")
 head = NodePath("CollisionShape3D/Head")
 collider = NodePath("CollisionShape3D")
+label = NodePath("Control/Label")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
 shape = SubResource("CapsuleShape3D_vho56")
@@ -79,6 +80,23 @@ offset_bottom = 72.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_pyidc")
+
+[node name="Label" type="Label" parent="CharacterBody3D/Control"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -21.5
+offset_top = -240.0
+offset_right = 21.5
+offset_bottom = -217.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "0 m/s"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="CSGBox3D" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
