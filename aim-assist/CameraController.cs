@@ -11,8 +11,8 @@ public partial class CameraController : Camera3D
 
 	private bool aaSlowdownEnabled = false;
 	private bool aaFollowEnabled = false;
-	private bool aaSnapToTargetEnabled = true;
-	private bool aaBulletMagnetEnabled = false;
+	private bool aaSnapToTargetEnabled = false;
+	private bool aaBulletMagnetEnabled = true;
 	
 	public override void _Ready()
 	{
@@ -60,7 +60,8 @@ public partial class CameraController : Camera3D
 
 			if (aaBulletMagnetEnabled)
 			{
-				AimAssist_BulletMagnet();
+				Vector3 magnet = AimAssist_BulletMagnet(enemy, 0.5f);
+				DebugDraw3D.DrawLine(camera.GlobalPosition - Vector3.Up * 0.1f, camera.GlobalPosition + magnet * aimAssistRange, Colors.Cyan, 0.1f);
 			}
 		}
 		else
@@ -117,7 +118,7 @@ public partial class CameraController : Camera3D
 	/// <summary>
 	/// Makes the camera follow the movement of the target.
 	/// </summary>
-	/// /// <param name="enemy">Enemy to follow</param>
+	/// <param name="enemy">Enemy to follow</param>
 	/// <param name="delta">deltaTime parameter</param>
 	/// <param name="strength">Strength of the effect. 0 - no effect. 1 - target movement is matched perfectly</param>
 	private Vector2 AimAssist_Follow(Enemy enemy, double delta, [Range(0f,1f)] float strength = 0.5f)
@@ -150,9 +151,19 @@ public partial class CameraController : Camera3D
 		camera.Rotation = rotation.Slerp(targetRotation, 0.1f).GetEuler();
 	}
 
-	private void AimAssist_BulletMagnet()
+	/// <summary>
+	/// Returns a vector directed towards the enemy
+	/// </summary>
+	/// <param name="enemy">Enemy to follow</param>
+	/// <param name="strength">Strength of the effect. 0 - no effect. 1 - exact direction towards the enemy</param>
+	private Vector3 AimAssist_BulletMagnet(Enemy enemy, float strength = 0.5f)
 	{
-		// TODO
+		Vector3 enemyDirection = (camera.GlobalPosition - enemy.GlobalPosition).Normalized();
+		Vector3 forward = camera.GlobalBasis.Z;
+		Vector3 cross = forward.Cross(enemyDirection);
+		float dot = forward.Dot(enemyDirection);
+	
+		return -camera.GlobalBasis.Z.Rotated(cross.Normalized(), Mathf.Acos(dot) * strength);
 	}
 }
 
