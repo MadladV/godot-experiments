@@ -1,0 +1,76 @@
+[gd_scene format=3 uid="uid://7ogm7rplyiux"]
+
+[ext_resource type="Script" path="res://CameraController.cs" id="1_jnlp7"]
+[ext_resource type="Script" uid="uid://dyfbadf81bxix" path="res://Enemy.cs" id="1_pq8q7"]
+[ext_resource type="Script" uid="uid://b8iwoyhj80kwr" path="res://AimAssistArea.cs" id="3_vvh5c"]
+[ext_resource type="Texture2D" uid="uid://inco450wgulu" path="res://assets/crosshair117.png" id="4_28aoi"]
+[ext_resource type="Texture2D" uid="uid://baj4rdyworu14" path="res://assets/prototype textures/Dark/texture_02.png" id="4_jnlp7"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_pq8q7"]
+
+[sub_resource type="Sky" id="Sky_pyidc"]
+sky_material = SubResource("ProceduralSkyMaterial_pq8q7")
+
+[sub_resource type="Environment" id="Environment_vvh5c"]
+background_mode = 2
+sky = SubResource("Sky_pyidc")
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_vho56"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_pq8q7"]
+radius = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l8v81"]
+albedo_texture = ExtResource("4_jnlp7")
+uv1_triplanar = true
+
+[node name="root" type="Node3D" unique_id=627411646]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=598168266]
+environment = SubResource("Environment_vvh5c")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=277166826]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
+script = ExtResource("1_jnlp7")
+
+[node name="Enemy" type="Node3D" parent="." unique_id=163236155]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -20)
+script = ExtResource("1_pq8q7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Enemy" unique_id=1031674301]
+mesh = SubResource("CapsuleMesh_vho56")
+
+[node name="Area3D" type="Area3D" parent="Enemy" unique_id=1380331695 node_paths=PackedStringArray("Parent")]
+script = ExtResource("3_vvh5c")
+Parent = NodePath("..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Enemy/Area3D" unique_id=1146205409]
+shape = SubResource("SphereShape3D_pq8q7")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=1101634166]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -12.5)
+material_override = SubResource("StandardMaterial3D_l8v81")
+size = Vector3(25, 1, 25)
+
+[node name="Control" type="Control" parent="." unique_id=402256988]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="Control" unique_id=815963812]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -72.0
+offset_top = -72.0
+offset_right = 72.0
+offset_bottom = 72.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_28aoi")

@@ -34,7 +34,7 @@ public partial class Player : CharacterBody3D
 			head.Rotation = head.Rotation with { X = Mathf.Clamp(head.Rotation.X, -1.5f, 1.5f)};
 			Rotation -= Vector3.Up * motion.Relative.X * lookSensitivity;
 		}
-	}
+    }
 
 	public override void _Process(double delta)
 	{
