@@ -6,22 +6,25 @@ public partial class Enemy : Node3D
 	private Vector3 lastPosition = Vector3.Zero;
 
 	private bool isPaused = true;
+	private float movementSpeed = 2.5f;
 	
 	public override void _Process(double delta)
 	{
-		if (!isPaused)
-		{
-			GlobalPosition = new Vector3(5f * Mathf.Sin(Time.GetTicksMsec() / 2000f), 1f, -20f);
-		}
-
 		if (Input.IsActionJustPressed("ui_accept"))
 		{
 			isPaused = !isPaused;
 		}
-
+		
+		if (!isPaused)
+		{
+			GlobalPosition += Vector3.Right * movementSpeed * (float)delta;
+		}
+		if (Mathf.Abs(GlobalPosition.X) > 5f)
+		{
+			movementSpeed = -movementSpeed;
+		}
+		
 		Velocity = (GlobalPosition - lastPosition) / (float)delta;
 		lastPosition = GlobalPosition;
-		
-		DebugDraw3D.DrawArrow(GlobalPosition - Vector3.Up, GlobalPosition + Velocity - Vector3.Up, Colors.Blue, 0.25f);
 	}
 }
