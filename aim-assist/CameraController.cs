@@ -9,10 +9,7 @@ public partial class CameraController : Camera3D
 	private float aimAssistRange = 50f;
 	private Camera3D camera; // For ease of decoupling aim assist from the camera controller
 
-	private bool aaSlowdownEnabled = false;
-	private bool aaFollowEnabled = false;
-	private bool aaSnapToTargetEnabled = false;
-	private bool aaBulletMagnetEnabled = true;
+	private bool captureCursor = false;
 	
 	public override void _Ready()
 	{
@@ -27,7 +24,7 @@ public partial class CameraController : Camera3D
 
 	public override void _Input(InputEvent @event)
 	{
-		if (@event is InputEventMouseMotion eventMouseMotion)
+		if (@event is InputEventMouseMotion eventMouseMotion && Input.MouseMode == Input.MouseModeEnum.Captured)
 		{
 			RotateCamera(eventMouseMotion.Relative);
 		}
@@ -37,14 +34,14 @@ public partial class CameraController : Camera3D
 	{
 		if (IsLookingAtEnemy(out Enemy enemy))
 		{
-			if (aaSlowdownEnabled)
+			if (Settings.aaSlow.isEnabled)
 			{
-				AimAssist_Slowdown(true, 0.5f);
+				AimAssist_Slowdown(true, Settings.aaSlow.strength);
 			}
 
-			if (aaFollowEnabled)
+			if (Settings.aaFollow.isEnabled)
 			{
-				Vector2 follow = AimAssist_Follow(enemy, delta, 0.5f);
+				Vector2 follow = AimAssist_Follow(enemy, delta, Settings.aaFollow.strength);
 				camera.RotateX(follow.X);
 				camera.RotateY(follow.Y);
 			}
@@ -53,15 +50,15 @@ public partial class CameraController : Camera3D
 			{
 				aaSnapTimer.Start();
 			}
-			if (!aaSnapTimer.IsStopped() && aaSnapToTargetEnabled)
+			if (!aaSnapTimer.IsStopped() && Settings.aaSnapTo.isEnabled)
 			{
 				AimAssist_SnapToTarget(enemy, delta);	
 			}
 
-			if (aaBulletMagnetEnabled)
+			if (Settings.aaMagnet.isEnabled)
 			{
-				Vector3 magnet = AimAssist_BulletMagnet(enemy, 0.5f);
-				DebugDraw3D.DrawLine(camera.GlobalPosition - Vector3.Up * 0.1f, camera.GlobalPosition + magnet * aimAssistRange, Colors.Cyan, 0.1f);
+				Vector3 magnet = AimAssist_BulletMagnet(enemy, Settings.aaMagnet.strength);
+				DebugDraw3D.DrawLine(camera.GlobalPosition - Vector3.Up * 0.1f, camera.GlobalPosition + magnet * aimAssistRange, Colors.Cyan);
 			}
 		}
 		else
@@ -142,7 +139,7 @@ public partial class CameraController : Camera3D
 	/// </summary>
 	/// <param name="enemy">Enemy to snap to</param>
 	/// <param name="delta">deltaTime parameter</param>
-	private void AimAssist_SnapToTarget(Enemy enemy, double delta)
+	private void AimAssist_SnapToTarget(Enemy enemy, double delta, float weight = 0.1f)
 	{
 		// TODO: Replace Slerp with something that will operate more consistently regardless of deltaTime
 		Quaternion rotation = new(camera.GlobalBasis);
